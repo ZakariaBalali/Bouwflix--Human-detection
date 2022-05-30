@@ -4,7 +4,7 @@ import cv2
 import os
 import moviepy.video.io.ImageSequenceClip
 
-#FRAME SPLITTER
+# FRAME SPLITTER
 direc = "C:\\Users\\zakar\\Desktop\\School\\InHolland\\Jaar 3\\Periode 4\\Project Bouwflix\\mecanoo_mec_bl_210719-avi_2022-05-07_1920"
 for path in os.listdir(direc):
     full_path = os.path.join(direc, path)
@@ -16,9 +16,9 @@ for path in os.listdir(direc):
 
             # creating a folder named data
             if not os.path.exists(
-                    "C:\\Users\\zakar\\Desktop\\School\\InHolland\\Jaar 3\\Periode 4\\Project Bouwflix\\Dataset"):
+                    "Data"):
                 os.makedirs(
-                    "C:\\Users\\zakar\\Desktop\\School\\InHolland\\Jaar 3\\Periode 4\\Project Bouwflix\\Dataset")
+                    "Data")
 
         # if not created then raise error
         except OSError:
@@ -26,7 +26,7 @@ for path in os.listdir(direc):
 
         # frame
         list = os.listdir(
-            "C:\\Users\\zakar\\Desktop\\School\\InHolland\\Jaar 3\\Periode 4\\Project Bouwflix\\Dataset")  # dir is your directory path
+            "Data")  # dir is your directory path
         currentframe = len(list)
         while (True):
 
@@ -35,7 +35,7 @@ for path in os.listdir(direc):
 
             if ret:
                 # if video is still left continue creating images
-                name = 'C:\\Users\\zakar\\Desktop\\School\\InHolland\\Jaar 3\\Periode 4\\Project Bouwflix\\Dataset\\frame' + str(
+                name = 'Data\\frame' + str(
                     currentframe) + '.jpg'
                 print('Creating...' + name)
 
@@ -52,14 +52,13 @@ for path in os.listdir(direc):
         cam.release()
         cv2.destroyAllWindows()
 
-
 # MODEL/YOLOV5
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 model.conf = 0.25  # NMS confidence threshold
 model.classes = 0
 # Images
 
-d = "C:\\Users\\zakar\\Desktop\\School\\InHolland\\Jaar 3\\Periode 4\\Project Bouwflix\\Dataset\\"
+d = "Data"
 destination_path = "Files"
 
 for path in os.listdir(d):
@@ -74,7 +73,7 @@ for path in os.listdir(d):
         else:
             os.remove(full_path)
 
-#MOVIEPY
+# MOVIEPY
 
 fps = 30
 
@@ -84,6 +83,6 @@ image_files = [os.path.join(destination_path, img)
 clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
 clip.write_videofile('CutVideo.mp4')
 
-filelist = [ f for f in os.listdir(destination_path) if f.endswith(".jpg") ]
+filelist = [f for f in os.listdir(destination_path) if f.endswith(".jpg")]
 for f in filelist:
     os.remove(os.path.join(destination_path, f))
