@@ -3,16 +3,15 @@ import shutil
 import cv2
 import os
 import moviepy.video.io.ImageSequenceClip
-from IPython.external.qt_for_kernel import QtGui
 
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QPixmap, QIcon
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 
 from PyQt5 import QtCore
 
 import sys
-
 
 
 def human_detection(filepath):
@@ -71,6 +70,12 @@ def human_detection(filepath):
     # Images
 
     d = "Data"
+
+    if not os.path.exists(
+            "Files"):
+        os.makedirs(
+            "Files")
+
     destination_path = "Files"
 
     for path in os.listdir(d):
@@ -93,57 +98,70 @@ def human_detection(filepath):
                    for img in sorted(os.listdir(destination_path), key=len)
                    if img.endswith(".jpg")]
     clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-    clip.write_videofile('CutVideo.mp4')
+    clip.write_videofile(os.path.expanduser("~/Desktop/CutMovie.mp4"))
 
     filelist = [f for f in os.listdir(destination_path) if f.endswith(".jpg")]
     for f in filelist:
         os.remove(os.path.join(destination_path, f))
 
-files = "none selected"
+
+
+files = "Nog geen folder geselecteerd"
 
 
 def dialog():
     files = str(QFileDialog.getExistingDirectory(None, "Select Directory"))
     label.setText(files)
     print(files)
+    buttonStart.setDisabled(False)
+
     return files
-
-
-def checkPath():
-    print(label.text())
 
 
 app = QApplication(sys.argv)
 
 win = QMainWindow()
 
-win.setGeometry(1000, 1000, 1000, 1000)
+win.setGeometry(200, 200, 1000, 500)
 
 win.setWindowTitle("Bouwflix")
+scriptDir = os.path.dirname(os.path.realpath(__file__))
+win.setWindowIcon(QIcon('icon.png'))
+# Choose folder button
+buttonFolder = QPushButton(win)
+buttonFolder.setText("Importeer map met filmpjes")
+buttonFolder.setStyleSheet("background-color : rgb(31, 115, 249)")
+buttonFolder.clicked.connect(dialog)
+buttonFolder.move(20, 100)
+buttonFolder.resize(150, 50)
 
-button = QPushButton(win)
-
-button.setText("Import filmpjes")
+# Label with path
 label = QtWidgets.QLabel(win)
-
 label.setText(files)
 label.resize(1000, 20)
-button.clicked.connect(dialog)
+label.move(28, 150)
 
-button.move(50, 50)
-button2 = QPushButton(win)
+# Start button
+buttonStart = QPushButton(win)
+buttonStart.setDisabled(True)
+buttonStart.clicked.connect(lambda: human_detection(label.text()))
+buttonStart.move(20, 300)
+buttonStart.setText("Start!")
+buttonStart.resize(150, 50)
 
-button2.clicked.connect(checkPath)
+# Image
+label2 = QtWidgets.QLabel(win)
+pixmap = QPixmap('Logo.png')
+label2.resize(pixmap.width(), pixmap.height())
+label2.move(20, 20)
+label2.setPixmap(pixmap)
 
-button2.move(100, 100)
-button2.setText("check file path")
+# Label with output explanation
+label3 = QtWidgets.QLabel(win)
+label3.setText("Het eindresultaat kunt u terug vinden op het bureaublad met de naam 'CutVideo.mp4'")
+label3.resize(1000, 20)
+label3.move(28, 350)
 
-button3 = QPushButton(win)
-
-button3.clicked.connect(lambda: human_detection(label.text()))
-
-button3.move(200, 200)
-button3.setText("Start human detection")
 win.show()
 
 sys.exit(app.exec_())
