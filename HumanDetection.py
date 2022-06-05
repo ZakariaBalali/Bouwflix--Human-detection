@@ -7,12 +7,12 @@ import moviepy.video.io.ImageSequenceClip
 
 from PyQt5.QtCore import *
 
-class MainBackgroundThread(QThread):
 
-    #custom signal for progress
+class MainBackgroundThread(QThread):
+    # custom signal for progress
     update_progress = pyqtSignal(int)
     current_state = pyqtSignal(str)
-    
+
     def __init__(self, uploadPath, destinationPath):
         QThread.__init__(self)
         self.uploadPath, self.destinationPath = uploadPath, destinationPath
@@ -104,10 +104,10 @@ class MainBackgroundThread(QThread):
         fps = 30
 
         image_files = [os.path.join(destination_path, img)
-                    for img in sorted(os.listdir(destination_path), key=len)
-                    if img.endswith(".jpg")]
+                       for img in sorted(os.listdir(destination_path), key=len)
+                       if img.endswith(".jpg")]
         clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-        #clip.write_videofile(os.path.expanduser(f"~/Desktop/{self.fileName}.mp4"))
+        # clip.write_videofile(os.path.expanduser(f"~/Desktop/{self.fileName}.mp4"))
         clip.write_videofile(self.destinationPath)
         self.update_progress.emit(90)
 

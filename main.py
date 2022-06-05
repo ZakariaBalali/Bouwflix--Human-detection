@@ -1,5 +1,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
@@ -155,8 +156,14 @@ class Ui_Bouwflix(object):
 
     
     def evt_worker_finished(self):
-        QMessageBox.information(self, "Klaar!", "Video is bewerkt")
         self.statusbar.showMessage(f"Video staat klaar in '{self.destinationPath}'" )
+        msg = QMessageBox()
+        msg.setIconPixmap(QPixmap("finished.png"))
+        msg.setWindowIcon(QtGui.QIcon('finished.png'))
+        msg.setText("Klaar!")
+        msg.setInformativeText("Alle video's zijn bewerkt.")
+        msg.setWindowTitle("Klaar!")
+        msg.exec_()
 
     def evt_update_progress(self, val):
         self.prgBar.setValue(val)
