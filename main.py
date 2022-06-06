@@ -100,7 +100,7 @@ class Ui_Bouwflix(object):
         self.btn_OpenFolder.setText(_translate("Bouwflix", "Open Folder..."))
         self.lbl_GeselecteerdeFolder.setText(_translate("Bouwflix", "Geen folder gekozen"))
         self.lbl_Titel.setText(_translate("Bouwflix", "Bouwflix."))
-        self.lbl_Info.setText(_translate("Bouwflix", "Deze applicatie detecteert personen doormiddel van een pretrained model genaamd ultralytics en verwijderd dode momenten uit video's van bouwplaatsen die van binnen uit zijn gefilmd."))
+        self.lbl_Info.setText(_translate("Bouwflix","Deze applicatie verwijderd dode momenten uit video\'s van bouwplaatsen die van binnen uit zijn gefilmd."))
         self.gp_Output.setTitle(_translate("Bouwflix", "Output"))
         self.btn_Start.setText(_translate("Bouwflix", "Start"))
         self.btn_Start.setDisabled(True)
@@ -145,6 +145,7 @@ class Ui_Bouwflix(object):
 
     # This method is used to start the Humandetection as a backgroundThread, so that the PYQT gui does not say 'not-responding'
     def evt_btnStart_clicked(self):
+        self.btn_Start.setDisabled(True)
         self.worker = MainBackgroundThread(self.uploadPath, self.destinationPath)
         self.worker.start()
         self.worker.finished.connect(self.evt_worker_finished)
@@ -155,6 +156,7 @@ class Ui_Bouwflix(object):
         self.statusbar.showMessage(f"De applicatie is gestart. Dit kan even duren. Een moment geduld aub")
 
     def evt_worker_finished(self):
+        self.btn_Start.setDisabled(False)
         self.statusbar.showMessage(f"Video staat klaar in '{self.destinationPath}'")
         msg = QMessageBox()
         msg.setIconPixmap(QPixmap("finished.png"))
