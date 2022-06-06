@@ -12,7 +12,7 @@ class MainBackgroundThread(QThread):
     # custom signal for progress
     update_progress = pyqtSignal(int)
     current_state = pyqtSignal(str)
-
+    output = pyqtSignal(str)
     def __init__(self, uploadPath, destinationPath):
         QThread.__init__(self)
         self.uploadPath, self.destinationPath = uploadPath, destinationPath
@@ -55,7 +55,7 @@ class MainBackgroundThread(QThread):
                         name = 'Data\\frame' + str(
                             currentframe) + '.jpg'
                         print('Creating...' + name)
-
+                        self.output.emit('Creating...' + name)
                         # writing the extracted images
                         cv2.imwrite(name, frame)
 
@@ -68,23 +68,23 @@ class MainBackgroundThread(QThread):
                 # Release all space and windows once done
                 cam.release()
                 cv2.destroyAllWindows()
-        self.update_progress.emit(50)
+        self.update_progress.emit(30)
         # MODEL/YOLOV5
         model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
         model.conf = 0.25  # NMS confidence threshold
         model.classes = 0
         # Images
-        self.current_state.emit("Fusing layers...")
+        self.current_state.emit("Detecting people...")
 
         d = "Data"
-        self.update_progress.emit(60)
+        self.update_progress.emit(40)
         if not os.path.exists(
                 "Files"):
             os.makedirs(
                 "Files")
 
         destination_path = "Files"
-        self.update_progress.emit(70)
+        self.update_progress.emit(50)
 
         for path in os.listdir(d):
             full_path = os.path.join(d, path)
@@ -95,14 +95,17 @@ class MainBackgroundThread(QThread):
                 if 0 in results.pandas().xyxy[0]['class']:
                     results.print()
                     new_location = shutil.move(full_path, destination_path)
+                    self.output.emit('Person detected in' + full_path)
+
                 else:
                     os.remove(full_path)
+                    self.output.emit('No person detected in ' + full_path)
 
         # MOVIEPY
         self.current_state.emit("Creating video...")
         self.update_progress.emit(80)
         fps = 30
-
+        self.output.emit('Making final video...')
         image_files = [os.path.join(destination_path, img)
                        for img in sorted(os.listdir(destination_path), key=len)
                        if img.endswith(".jpg")]
@@ -116,3 +119,4 @@ class MainBackgroundThread(QThread):
             os.remove(os.path.join(destination_path, f))
         self.update_progress.emit(100)
         self.current_state.emit("Finished!")
+        self.output.emit("Finished!")

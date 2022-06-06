@@ -143,20 +143,19 @@ class Ui_Bouwflix(object):
                 self.statusbar.showMessage(f"Druk op start om de video's in de '{self.uploadPath}' te bewerken. ")
 
 
-    #This method is used to start the Humandetection as a backgroundThread, so that the PYQT gui does not say 'not-responding'
+    # This method is used to start the Humandetection as a backgroundThread, so that the PYQT gui does not say 'not-responding'
     def evt_btnStart_clicked(self):
-        self.worker = MainBackgroundThread(self.uploadPath,self.destinationPath)
+        self.worker = MainBackgroundThread(self.uploadPath, self.destinationPath)
         self.worker.start()
         self.worker.finished.connect(self.evt_worker_finished)
         self.worker.update_progress.connect(self.evt_update_progress)
         self.worker.current_state.connect(self.evt_current_state)
-
+        self.worker.output.connect(self.evt_update_textedit)
         # message which is shown in bottom statusbar
         self.statusbar.showMessage(f"De applicatie is gestart. Dit kan even duren. Een moment geduld aub")
 
-    
     def evt_worker_finished(self):
-        self.statusbar.showMessage(f"Video staat klaar in '{self.destinationPath}'" )
+        self.statusbar.showMessage(f"Video staat klaar in '{self.destinationPath}'")
         msg = QMessageBox()
         msg.setIconPixmap(QPixmap("finished.png"))
         msg.setWindowIcon(QtGui.QIcon('finished.png'))
@@ -170,6 +169,9 @@ class Ui_Bouwflix(object):
 
     def evt_current_state(self, state):
         self.lbl_Progress.setText(state)
+
+    def evt_update_textedit(self, val):
+        self.textBrowser_Output.append(val)
 
 
 
